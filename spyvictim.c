@@ -29,9 +29,9 @@ unsigned long long cross(int loop_max) {
 	{
 		before = rdtsc();
 #ifdef VICTIM
-		asm goto("jmp %l0\n" : /*output*/: /*input*/ : /*clobbers*/:  T2);
+		asm goto("jmp %l0\n" : /*output*/: /*input*/ : /*clobbers*/:  T1, T2);
 #elif SPY
-		asm goto("jmp %l0\n" : /*output*/: /*input*/ : /*clobbers*/:  T1);
+		asm goto("jmp %l0\n" : /*output*/: /*input*/ : /*clobbers*/:  T2, T1);
 #else
 #error VICTIM or SPY must be defined.
 #endif
@@ -123,7 +123,7 @@ int main() {
 
 		iterations += 50;
 	}
-	average = totals / iterations;
+	average = (totals*1.0) / (iterations*1.0);
 	printf("victim time per iteration: %f\n", average);
 #elif SPY
 	for (int i = 0; i<counter; i++) {
@@ -134,7 +134,7 @@ int main() {
 
 		iterations+=1;
 	}
-	average = totals / iterations;
+	average = (totals*1.0) / (iterations*1.0);
 	printf("spy time per iteration: %f\n", average);
 #endif
 
