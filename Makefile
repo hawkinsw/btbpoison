@@ -14,6 +14,6 @@ poison.obj: poison
 simple: simple.c Makefile
 	gcc -g -o simple simple.c -O0
 clean: 
-	rm -f poison *.o core poison.obj pipe simple spy victim
+	rm -f poison *.o core pipe simple spy victim
 clean_pipes:
 	rm -f /tmp/parent_to_child.pipe /tmp/child_to_parent.pipe
