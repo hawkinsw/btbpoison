@@ -1,14 +1,14 @@
 all: poison pipe poison.obj time_mispredict_asm spy victim time_mispredict_c
 
 spy: spyvictim.c Makefile
-	gcc -o spy spyvictim.c -g -O0 -DSPY
+	gcc -o spy spyvictim.c -g -O0 -DSPY -std=gnu99
 victim: spyvictim.c Makefile
-	gcc -o victim spyvictim.c -g -O0 -DVICTIM
+	gcc -o victim spyvictim.c -g -O0 -DVICTIM -std=gnu99
 poison: poison.c Makefile
-	gcc -g -o poison poison.c -O0
-	gcc -S -g -o poison.s poison.c -O0
+	gcc -g -o poison poison.c -O0 -std=gnu99
+	gcc -S -g -o poison.s poison.c -O0 -std=gnu99
 pipe: pipe.c Makefile
-	gcc -o pipe pipe.c -O0
+	gcc -o pipe pipe.c -O0 -std=gnu99
 poison.obj: poison
 	objdump -D poison > poison.obj
 time_mispredict_asm: time_mispredict_asm.s
