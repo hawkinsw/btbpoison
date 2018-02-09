@@ -16,10 +16,13 @@ done | awk -F: "
 		/^cold/ {cold_total+=\$2; cold_iterations+=1;}
 		/^hot/ {hot_total+=\$2; hot_iterations+=1;}
 		END{ 
+			cold_average = ((cold_total*1.0)/cold_iterations);
+			hot_average = ((hot_total*1.0)/hot_iterations);
 			printf \"cold_iterations: %d\n\", cold_iterations; 
 			printf \"hot_iterations: %d\n\", hot_iterations;
 			printf \"hot_total: %d\n\", hot_total;
 			printf \"cold_total: %d\n\", cold_total;
-			printf \"hot average : %f\n\", ((hot_total*1.0)/hot_iterations);
-			printf \"cold average: %f\n\", ((cold_total*1.0)/cold_iterations);
+			printf \"hot average : %f\n\", hot_average;
+			printf \"cold average: %f\n\", cold_average;
+			printf \"difference  : %f\n\", (((hot_average-cold_average)/cold_average)*100.0);
 		}";
