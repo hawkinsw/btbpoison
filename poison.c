@@ -61,7 +61,7 @@ int main() {
 	char just_read = '\n';
 	char to_write = 'W';
 
-	unsigned long long totals = 0;
+	unsigned long long totals = 0, fake = 0;
 	unsigned int iterations = 0;
 	unsigned int inner_iterations = 10;
 	unsigned int counter = 1;
@@ -93,7 +93,7 @@ int main() {
 
 			write(c2p_write, &to_write, 1);
 
-			iterations += 25;
+			iterations += 1;
 		}
 		average = (totals*1.0) / iterations;
 		printf("child time per iteration: %f\n", average);
@@ -101,6 +101,10 @@ int main() {
 	}
 
 	for (int i = 0; i<counter; i++) {
+		/*
+		 * This is optional.
+		fake = cross(1, 25);
+		 */
 		write(p2c_write, &to_write, 1);
 		read(c2p_read, &just_read, 1);
 		totals += cross(2, 1);
