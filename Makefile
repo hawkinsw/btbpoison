@@ -15,7 +15,7 @@ victim: spyvictim.c Makefile
 	gcc -o victim spyvictim.c -DVICTIM $(EXTRA_CFLAGS)
 poison: poison.c Makefile
 	gcc -o poison poison.c $(EXTRA_CFLAGS)
-	gcc -S -o poison.s poison.c
+	gcc -S -o poison.s poison.c $(EXTRA_CFLAGS)
 pipe: pipe.c Makefile
 	gcc -o pipe pipe.c $(EXTRA_CFLAGS)
 poison.obj: poison
