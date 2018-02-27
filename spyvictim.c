@@ -16,13 +16,13 @@ extern int errno;
 
 static inline __attribute__((always_inline)) unsigned long long rdtsc(void)
 {
-	unsigned hi, lo;
-	__asm__ __volatile__ ("rdtscp;" : "=a"(lo), "=d"(hi) : : "ecx");
+	register unsigned hi, lo;
+	__asm__ __volatile__ ("cpuid; rdtscp;" : "=a"(lo), "=d"(hi) : "a"(0): "ecx");
 	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
 
 unsigned long long cross(int loop_max) {
-	unsigned long long before, after;
+	register unsigned long long before, after;
 	unsigned long long total = 0;
 
 	for (int i = 0; i<loop_max; i++)
