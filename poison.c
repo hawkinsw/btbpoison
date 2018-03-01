@@ -39,6 +39,17 @@ unsigned long long cross(int target, int loop_max) {
 	{
 		before = rdtsc();
 		asm goto("jmp *%%r12\n" : /*output*/:/*input*/:/*clobbers*/:  T1, T2);
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
+		asm ("nop; nop; nop; nop;\n");
 T1:
 		after = rdtsc();
 		delta = (after - before);
