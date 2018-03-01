@@ -90,6 +90,20 @@ int main() {
 		return 1;
 	}
 
+	totals = cross(1,1);
+	printf("uncached time jump to 1: %llu\n", totals);
+	cross(1,1000);
+	totals = cross(1,1);
+	printf("  cached time jump to 1: %llu\n", totals);
+
+	totals = cross(2,1);
+	printf("uncached time jump to 2: %llu\n", totals);
+	cross(2,1000);
+	totals = cross(2,1);
+	printf("  cached time jump to 2: %llu\n", totals);
+
+	totals = 0.0;
+
 	c2p_read = child_to_parent_pipe[0];
 	c2p_write= child_to_parent_pipe[1];
 
