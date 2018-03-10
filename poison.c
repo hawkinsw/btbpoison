@@ -186,10 +186,11 @@ int main() {
 		for (int i = 0; i<counter; i++) {
 			read(p2c_read, &just_read, 1);
 
+#define CHILD_TARGET 2
 #ifndef USEMSR
-			totals += cross(2, 100, "Child");
+			totals += cross(CHILD_TARGET, 100, "Child");
 #else
-			totals += cross(2, 100, "Child", &misses);
+			totals += cross(CHILD_TARGET, 100, "Child", &misses);
 #endif
 			write(c2p_write, &to_write, 1);
 
@@ -212,10 +213,12 @@ int main() {
 		 */
 		write(p2c_write, &to_write, 1);
 		read(c2p_read, &just_read, 1);
+
+#define PARENT_TARGET 1
 #ifndef USEMSR
-		totals += cross(1, 1, "Parent");
+		totals += cross(PARENT_TARGET, 1, "Parent");
 #else
-		totals += cross(1, 1, "Parent", &misses);
+		totals += cross(PARENT_TARGET, 1, "Parent", &misses);
 #endif
 		iterations+=1;
 	}
