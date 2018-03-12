@@ -32,7 +32,8 @@ unsigned long long cross(int target,
 	const char *context
 #ifdef USEMSR
 	,
-	unsigned long long *misses
+	unsigned long long *misses,
+	unsigned long long *clears
 #endif
 	) {
 	register void *t asm ("r12") = NULL;
@@ -43,6 +44,7 @@ unsigned long long cross(int target,
 	Msr msr;
 	uint64_t sel0 = 0x0;
 	uint64_t sel1 = 0x0;
+	uint64_t sel2 = 0x0;
 	uint64_t perf_ctr = 0x0;
 	uint64_t msr_result = 0x0;
 	uint64_t zero = 0x0;
@@ -65,7 +67,7 @@ unsigned long long cross(int target,
 	{
 
 #ifdef USEMSR
-	perf_ctr = MSR::PERF_EVTSEL0_ENABLE | MSR::PERF_EVTSEL1_ENABLE;
+	perf_ctr = MSR::PERF_EVTSEL0_ENABLE | MSR::PERF_EVTSEL1_ENABLE | MSR::PERF_EVTSEL2_ENABLE;
 
 	sel0 = MSR::EVT_BR_MISP_RETIRED |
 	       MSR::MASK_BR_MISP_RETIRED_ALL |
@@ -77,11 +79,18 @@ unsigned long long cross(int target,
 	       MSR::EVENT_ENABLE |
 	       MSR::EVENT_USER_ENABLE;
 
+	sel2 = MSR::EVT_BACLEAR |
+	       MSR::MASK_BACLEAR_ANY |
+	       MSR::EVENT_ENABLE |
+	       MSR::EVENT_USER_ENABLE;
+
 	assert(msr.Write(MSR::MSR_CORE_PERF_GLOBAL_CTRL, zero, CPU_NO) == 0);
 	assert(msr.Write(MSR::MSR_IA32_PERFEVTSEL0, sel0, CPU_NO) == 0);
 	assert(msr.Write(MSR::MSR_IA32_PERFEVTSEL1, sel1, CPU_NO) == 0);
+	assert(msr.Write(MSR::MSR_IA32_PERFEVTSEL2, sel2, CPU_NO) == 0);
 	assert(msr.Write(MSR::MSR_IA32_PMC0, zero, CPU_NO) == 0);
 	assert(msr.Write(MSR::MSR_IA32_PMC1, zero, CPU_NO) == 0);
+	assert(msr.Write(MSR::MSR_IA32_PMC2, zero, CPU_NO) == 0);
 	(msr.Write(MSR::MSR_CORE_PERF_GLOBAL_CTRL, perf_ctr, CPU_NO) == 0);
 #endif
 
@@ -105,10 +114,12 @@ T1:
 	assert(msr.Write(MSR::MSR_IA32_PERFEVTSEL0, zero, CPU_NO) == 0);
 
 	assert(msr.Read(MSR::MSR_IA32_PMC1, msr_result, CPU_NO) == 0);
-	//std::cout << context << " branch count: " << std::dec << msr_result << std::endl;
+
 	assert(msr.Read(MSR::MSR_IA32_PMC0, msr_result, CPU_NO) == 0);
-	//std::cout << context << " missed branch count: " << std::dec << msr_result << std::endl;
 	*misses = msr_result;
+
+	assert(msr.Read(MSR::MSR_IA32_PMC2, msr_result, CPU_NO) == 0);
+	*clears = msr_result;
 #endif
 	delta = (after - before);
 		continue;
@@ -119,10 +130,12 @@ T2:
 	assert(msr.Write(MSR::MSR_IA32_PERFEVTSEL0, zero, CPU_NO) == 0);
 
 	assert(msr.Read(MSR::MSR_IA32_PMC1, msr_result, CPU_NO) == 0);
-	//std::cout << context << " branch count: " << std::dec << msr_result << std::endl;
+
 	assert(msr.Read(MSR::MSR_IA32_PMC0, msr_result, CPU_NO) == 0);
-	//std::cout << context << " missed branch count: " << std::dec << msr_result << std::endl;
 	*misses = msr_result;
+
+	assert(msr.Read(MSR::MSR_IA32_PMC2, msr_result, CPU_NO) == 0);
+	*clears= msr_result;
 #endif
 		delta = (after - before);
 		continue;
@@ -144,7 +157,10 @@ int main() {
 	unsigned int iterations = 0;
 	unsigned int inner_iterations = 10;
 	unsigned int counter = 1;
+#ifdef USEMSR
 	unsigned long long misses = 0;
+	unsigned long long clears = 0;
+#endif
 
 	float average = 0.0;
 
@@ -190,7 +206,7 @@ int main() {
 #ifndef USEMSR
 			totals += cross(CHILD_TARGET, 100, "Child");
 #else
-			totals += cross(CHILD_TARGET, 100, "Child", &misses);
+			totals += cross(CHILD_TARGET, 100, "Child", &misses, &clears);
 #endif
 			write(c2p_write, &to_write, 1);
 
@@ -202,6 +218,8 @@ int main() {
 #else
 		average = (misses*1.0) / (iterations);
 		printf("child misses per iteration: %f\n", average);
+		average = (clears*1.0) / (iterations);
+		printf("child clears per iteration: %f\n", average);
 #endif
 		return 0;
 	}
@@ -214,11 +232,11 @@ int main() {
 		write(p2c_write, &to_write, 1);
 		read(c2p_read, &just_read, 1);
 
-#define PARENT_TARGET 1
+#define PARENT_TARGET 2
 #ifndef USEMSR
 		totals += cross(PARENT_TARGET, 1, "Parent");
 #else
-		totals += cross(PARENT_TARGET, 1, "Parent", &misses);
+		totals += cross(PARENT_TARGET, 1, "Parent", &misses, &clears);
 #endif
 		iterations+=1;
 	}
@@ -229,6 +247,8 @@ int main() {
 #else
 	average = (misses*1.0) / iterations;
 	printf("parent misses per iteration: %f\n", average);
+	average = (clears*1.0) / (iterations);
+	printf("parent clears per iteration: %f\n", average);
 #endif
 
 	waitpid(child, NULL, 0);
