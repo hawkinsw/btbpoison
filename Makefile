@@ -50,6 +50,6 @@ time_mispredict_c: time_mispredict_c.c Makefile
 	gcc -o time_mispredict_c time_mispredict_c.c $(EXTRA_CFLAGS)
 
 clean: 
-	rm -f poison *.o core pipe spy victim time_mispredict_asm time_mispredict_c poison.s victim.obj spy.obj time_jump
+	rm -f poison *.o core pipe spy victim time_mispredict_asm time_mispredict_c poison.s victim.obj spy.obj time_jump attack.obj attack
 clean_pipes:
 	rm -f /tmp/parent_to_child.pipe /tmp/child_to_parent.pipe
