@@ -1,4 +1,4 @@
-all: poison pipe poison.obj time_mispredict_asm spy victim time_mispredict_c spy.obj victim.obj time_jump
+all: poison pipe poison.obj time_mispredict_asm spy victim time_mispredict_c spy.obj victim.obj time_jump attack attack.obj
 
 EXTRA_CFLAGS=-std=gnu99 -O0
 EXTRA_CXXFLAGS=-std=c++11 -O0
@@ -23,6 +23,12 @@ victim.obj: victim
 
 time_jump: time_jump.c Makefile
 	gcc -o time_jump time_jump.c $(EXTRA_CFLAGS)
+
+attack: attack.c Makefile
+	gcc -o attack attack.c $(EXTRA_CFLAGS)
+	gcc -S -o attack.s attack.c $(EXTRA_CFLAGS)
+attack.obj: attack
+	objdump -D attack > attack.obj
 
 poison: poison.c Makefile
 ifndef MSR
