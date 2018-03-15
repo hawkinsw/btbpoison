@@ -41,7 +41,7 @@ void *jump_target = NULL;
 static inline __attribute__((always_inline)) unsigned long long rdtsc(void)
 {
 	unsigned hi, lo;
-	__asm__ __volatile__ ("rdtscp;" : "=a"(lo), "=d"(hi) : : "ecx");
+	__asm__ __volatile__ ("mfence; rdtsc;" : "=a"(lo), "=d"(hi) : : "ecx");
 	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
 
